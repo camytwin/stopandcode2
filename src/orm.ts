@@ -42,15 +42,22 @@ export const getPosts = async () => {
 
 
 //FUNZIONE AGGIORNA POST IN BASE ALL'ID
-export const updatePosts = async (id: string) => {
+export const updatePosts = async (id: string, attivo: boolean) => {
 
     try {
         await mongoose.connect(process.env.MONGO_ATLAS_CONNECTION_STRING!, {dbName:"collezionePosts"})
 
-        const nuovoNomePost = "Nome post Aggiornato"
-        const UpdatedPost = await Post.findByIdAndUpdate(id,{nome: nuovoNomePost}, { new: true, runValidators: true })
-
-     return UpdatedPost;
+        let post = await Post.findById(id);
+        //const nuovoNomePost = "Nome post Aggiornato"
+        //const UpdatedPost = await Post.findByIdAndUpdate(id,{nome: nuovoNomePost}, {new: true, runValidators: true})
+        
+        if (!post){
+            throw new Error("post non trovato")
+        }
+            post.attivo = attivo;    
+        
+            return await post.save();
+     //return UpdatedPost;
 
     } catch (error) {
         console.log(error);
